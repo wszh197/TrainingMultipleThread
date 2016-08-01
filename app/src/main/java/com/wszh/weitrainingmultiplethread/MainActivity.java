@@ -4,6 +4,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Handler;
+import android.os.Looper;
 import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -23,11 +24,18 @@ public class MainActivity extends AppCompatActivity {
     private ProgressBar mProgressBar;  //4.加进度条
 
     //5.
-    private Handler mHandler=new Handler(){
+    private Handler mHandler=new Handler(Looper.getMainLooper()){
 
         @Override
         public void handleMessage(Message msg) {
-            mProgressBar.setVisibility(View.VISIBLE);
+            switch (msg.what) {
+                case 0:
+                    mProgressBar.setVisibility(View.VISIBLE);
+                    break;
+                case 1:
+                    mProgressBar.setProgress((int)msg.obj);
+            }
+
         }
     };
 
@@ -183,7 +191,21 @@ public class MainActivity extends AppCompatActivity {
                             @Override
                             public void run() {
                                 Message msg=new Message();
+                                msg.what=0;
                                 mHandler.sendMessage(msg);
+                                for(int i=1;i<11;i++) {
+                                    sleep();
+                                    Message msg2 = new Message();
+                                    msg2.what=1;
+                                    msg2.obj=i*10;
+                                }
+                            }
+                            private void sleep() {
+                                try {
+                                    Thread.sleep(1000);
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                }
                             }
                         }
                 ).start();
