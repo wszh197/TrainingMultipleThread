@@ -191,13 +191,14 @@ public class MainActivity extends AppCompatActivity {
                             @Override
                             public void run() {
                                 Message msg=new Message();
-                                msg.what=0;
+                                msg.what=0;  //让Progressbar显示出来
                                 mHandler.sendMessage(msg);
                                 for(int i=1;i<11;i++) {
                                     sleep();
                                     Message msg2 = new Message();
-                                    msg2.what=1;
+                                    msg2.what=1;//表示让progressbar往前走
                                     msg2.obj=i*10;
+                                    mHandler.sendMessage(msg2);
                                 }
                             }
                             private void sleep() {
