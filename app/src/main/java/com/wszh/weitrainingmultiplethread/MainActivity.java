@@ -22,6 +22,8 @@ public class MainActivity extends AppCompatActivity {
     private Button mLoadImageButton;
     private Button mToasButton;
     private ProgressBar mProgressBar;  //4.加进度条
+    private static final int PROGRESS_VISIBILITY=0;
+
 
     //5.
     private Handler mHandler=new Handler(Looper.getMainLooper()){
@@ -30,10 +32,16 @@ public class MainActivity extends AppCompatActivity {
         public void handleMessage(Message msg) {
             switch (msg.what) {
                 case 0:
+                    mProgressBar.setProgress(0);
                     mProgressBar.setVisibility(View.VISIBLE);
                     break;
                 case 1:
                     mProgressBar.setProgress((int)msg.obj);
+                    break;
+                case 2:
+                    mImageView.setImageBitmap((Bitmap) msg.obj);
+                    mProgressBar.setVisibility(View.INVISIBLE);
+                    break;
             }
 
         }
@@ -173,7 +181,7 @@ public class MainActivity extends AppCompatActivity {
     }
 1234*/
 
-    //使用handler实现
+    //5.使用handler实现,本例不应用handler实现，应该用AsyncTask
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
@@ -190,16 +198,26 @@ public class MainActivity extends AppCompatActivity {
                         new Runnable() {
                             @Override
                             public void run() {
-                                Message msg=new Message();
-                                msg.what=0;  //让Progressbar显示出来
-                                mHandler.sendMessage(msg);
+                                // Message msg=new Message();  //每次都new一个Message不好
+                                Message msg=mHandler.obtainMessage();
+                                //msg.what=0;  //让Progressbar显示出来
+                                msg.what=PROGRESS_VISIBILITY;
+                                //mHandler.sendMessage(msg);  //直接调用 handler 的发送消息方法发送消息
+                                msg.sendToTarget();  //message 从handler 类获取，从而可以直接向该handler 对象发送消息
                                 for(int i=1;i<11;i++) {
                                     sleep();
-                                    Message msg2 = new Message();
+                                    //Message msg2 = new Message();
+                                    Message msg2 =mHandler.obtainMessage();
                                     msg2.what=1;//表示让progressbar往前走
                                     msg2.obj=i*10;
                                     mHandler.sendMessage(msg2);
                                 }
+                                Bitmap bitmap=BitmapFactory.decodeResource(getResources(),
+                                        R.drawable.ic_launcher);
+                                Message msgBitMag=mHandler.obtainMessage();
+                                msgBitMag.what=2;
+                                msgBitMag.obj=bitmap;
+                                mHandler.sendMessage(msgBitMag);
                             }
                             private void sleep() {
                                 try {
